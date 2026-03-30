@@ -8,7 +8,9 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 uv sync
 
 #install mattersim for property evaluation
-git clone https://github.com/jpata/mattersim.git && cd mattersim && uv sync
+git clone https://github.com/jpata/mattersim.git && cd mattersim && uv sync && cd ..
+
+mkdir logs
 
 #Run unguided generation
 sbatch scripts/workflow.sh
