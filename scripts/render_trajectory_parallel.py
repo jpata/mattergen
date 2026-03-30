@@ -118,7 +118,7 @@ if __name__ == "__main__":
     parser.add_argument("--name", type=str, default="gen_0.extxyz", help="Trajectory filename in zip")
     parser.add_argument("--out", type=str, default="results/trajectory_render_parallel.mp4", help="Output video path")
     parser.add_argument("--fps", type=int, default=50, help="Frames per second")
-    parser.add_argument("--workers", type=int, default=None, help="Number of parallel workers")
+    parser.add_argument("--workers", type=int, default=8, help="Number of parallel workers")
 
     args = parser.parse_args()
     render_trajectory_parallel(args.zip, args.name, args.out, args.fps, args.workers)

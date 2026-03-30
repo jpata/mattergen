@@ -115,8 +115,14 @@ def visualize_metrics(json_path, output_path):
     print(f"Comprehensive dashboard saved to {output_path}")
 
 if __name__ == "__main__":
-    json_path = Path("results/detailed_metrics.json")
-    output_path = Path("results/detailed_metrics_visualization.png")
+    import argparse
+    parser = argparse.ArgumentParser(description="Visualize evaluation metrics")
+    parser.add_argument("--json", type=str, default="results/detailed_metrics.json", help="Path to detailed metrics json")
+    parser.add_argument("--out", type=str, default="results/detailed_metrics_visualization.png", help="Output image path")
+    args = parser.parse_args()
+
+    json_path = Path(args.json)
+    output_path = Path(args.out)
     if json_path.exists():
         visualize_metrics(json_path, output_path)
     else:
