@@ -73,7 +73,7 @@ def visualize_grid(zip_path, metrics_path, output_path, rotation='45x,45y,0z'):
                         f"{filename} | {formula}\n"
                         f"E_hull: {e_hull:.3f} eV/atom\n"
                         f"RMSD: {rmsd:.3f} Å\n"
-                        f"Status: {'Stable' if stable else 'Unstable'} | {'Novel' if novel else 'Known'}"
+                        f"Status: {'Stable' if stable else 'Unstable'} | {'New Struct.' if novel else 'Known Struct.'}"
                     )
                     
                     ax.set_title(title_text, fontsize=9, pad=10, fontweight='bold' if stable else 'normal', color='red' if (stable and novel) else 'black')

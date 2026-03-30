@@ -37,7 +37,8 @@ def visualize_metrics(json_path, output_path):
 
     # Map boolean values to descriptive strings
     df['Stability Status'] = df['Stable'].map({True: 'Stable', False: 'Unstable'})
-    df['Novelty Status'] = df['Novel'].map({True: 'Novel', False: 'Known'})
+    df['Novelty Status'] = df['Novel'].map({True: 'New Structure', False: 'Known Structure'})
+    df['SC Stability Status'] = (df['SC Energy above hull (eV/atom)'] <= 0.1).map({True: 'Stable', False: 'Unstable'})
 
     # Set up the figure with a 3x3 grid
     fig = plt.figure(figsize=(24, 18))
@@ -47,39 +48,38 @@ def visualize_metrics(json_path, output_path):
     # ROW 1: ENERGY & RELAXATION
     # 1. Energy above hull per atom
     ax1 = fig.add_subplot(gs[0, 0])
-    sns.barplot(data=df, x='Formula', y='Energy above hull (eV/atom)', ax=ax1, hue='Stability Status', palette='viridis')
+    sns.barplot(data=df, x='Formula', y='Energy above hull (eV/atom)', ax=ax1, hue='Stability Status', palette={'Stable': '#2ecc71', 'Unstable': '#e74c3c'})
     ax1.axhline(0.1, ls='--', color='black', alpha=0.5)
     ax1.set_title('Thermodynamic Stability (Reference Hull)', fontsize=14, fontweight='bold')
-    ax1.tick_params(axis='x', rotation=45)
+    ax1.tick_params(axis='x', rotation=90, labelsize=8)
 
     # 2. Self-Consistent Energy above hull
     ax2 = fig.add_subplot(gs[0, 1])
-    sns.barplot(data=df, x='Formula', y='SC Energy above hull (eV/atom)', ax=ax2, palette='magma')
+    sns.barplot(data=df, x='Formula', y='SC Energy above hull (eV/atom)', ax=ax2, hue='SC Stability Status', palette={'Stable': '#2ecc71', 'Unstable': '#e74c3c'})
     ax2.axhline(0.1, ls='--', color='black', alpha=0.5)
     ax2.set_title('Self-Consistent Stability (Batch Hull)', fontsize=14, fontweight='bold')
-    ax2.tick_params(axis='x', rotation=45)
+    ax2.tick_params(axis='x', rotation=90, labelsize=8)
 
     # 3. RMSD from relaxation
     ax3 = fig.add_subplot(gs[0, 2])
     sns.barplot(data=df, x='Formula', y='RMSD from relaxation (Å)', ax=ax3, hue='Novelty Status', palette='Set2')
     ax3.set_title('Structural Change (RMSD)', fontsize=14, fontweight='bold')
-    ax3.tick_params(axis='x', rotation=45)
+    ax3.tick_params(axis='x', rotation=90, labelsize=8)
 
     # ROW 2: DIVERSITY & NOVELTY
     # 4. Ideal Structures (Novel + Unique + Stable)
     ax4 = fig.add_subplot(gs[1, 0])
     ideal_counts = df['Ideal'].value_counts()
-    ax4.pie(ideal_counts, labels=ideal_counts.index.map({True: 'Ideal', False: 'Other'}), 
+    ax4.pie(ideal_counts, labels=ideal_counts.index.map({True: 'Ideal', False: 'Other'}),
             autopct='%1.1f%%', colors=['#9b59b6', '#bdc3c7'], startangle=140)
-    ax4.set_title('Ideal Structure Rate\n(Novel + Unique + Stable)', fontsize=14, fontweight='bold')
+    ax4.set_title('Ideal Structure Rate\n(New Struct. + Unique + Stable)', fontsize=14, fontweight='bold')
 
     # 5. Explored Systems
     ax5 = fig.add_subplot(gs[1, 1])
     explored_counts = df['Explored'].value_counts()
-    ax5.pie(explored_counts, labels=explored_counts.index.map({True: 'Known System', False: 'New System'}), 
+    ax5.pie(explored_counts, labels=explored_counts.index.map({True: 'Known Chem. System', False: 'New Chem. System'}), 
             autopct='%1.1f%%', colors=['#3498db', '#e67e22'], startangle=140)
-    ax5.set_title('Chemical System Discovery\n(Explored vs Unexplored)', fontsize=14, fontweight='bold')
-
+    ax5.set_title('Chemical System Discovery\n(Explored vs Unexplored Systems)', fontsize=14, fontweight='bold')
     # 6. Batch Uniqueness
     ax6 = fig.add_subplot(gs[1, 2])
     unique_counts = df['Unique'].value_counts()
