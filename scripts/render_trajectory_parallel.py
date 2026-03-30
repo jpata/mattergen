@@ -3,7 +3,7 @@ import zipfile
 import tempfile
 import argparse
 import shutil
-import subprocess
+import imageio
 import numpy as np
 from multiprocessing import Pool
 from tqdm import tqdm
@@ -26,8 +26,6 @@ def render_frame(args):
     ax.set_ylim(ylim)
     
     # Fixed Title position and formatting
-    # Using ax.text for more stable positioning if needed, 
-    # but with fixed limits, ax.set_title should be fine.
     ax.set_title(f"Step {i} | {atoms.get_chemical_formula()}", pad=20)
     ax.axis('off')
     
@@ -88,26 +86,16 @@ def render_trajectory_parallel(zip_path, trajectory_filename, output_path, fps=5
         worker_args = [(i, frames[i], tmp_frame_dir, global_xlim, global_ylim, rotation) for i in range(num_frames)]
         
         with Pool(processes=num_workers) as pool:
-            list(tqdm(pool.imap(render_frame, worker_args), total=num_frames, desc="Rendering frames"))
+            frame_paths = list(tqdm(pool.imap(render_frame, worker_args), total=num_frames, desc="Rendering frames"))
 
         print(f"Stitching frames into video: {output_path}")
-        ffmpeg_cmd = [
-            'ffmpeg', '-y',
-            '-framerate', str(fps),
-            '-i', os.path.join(tmp_frame_dir, 'frame_%06d.png'),
-            '-vf', "scale=trunc(iw/2)*2:trunc(ih/2)*2",
-            '-c:v', 'libx264',
-            '-pix_fmt', 'yuv420p',
-            '-crf', '18',
-            output_path
-        ]
         
-        result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True)
-        if result.returncode != 0:
-            print("FFmpeg Error:")
-            print(result.stderr)
-        else:
-            print(f"Video saved successfully to {output_path}")
+        with imageio.get_writer(output_path, fps=fps, codec='libx264', pixelformat='yuv420p', quality=8) as writer:
+            for path in tqdm(frame_paths, desc="Stitching frames"):
+                image = imageio.imread(path)
+                writer.append_data(image)
+        
+        print(f"Video saved successfully to {output_path}")
 
     finally:
         shutil.rmtree(tmp_frame_dir)
