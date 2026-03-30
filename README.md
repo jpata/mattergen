@@ -4,6 +4,9 @@
 #install uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
+#install mattergen
+git clone https://github.com/jpata/mattergen.git
+
 #install the requirements of this package
 uv sync
 
