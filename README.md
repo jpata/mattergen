@@ -1,4 +1,29 @@
 
+# Tallinn instructions
+```
+#install uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+#install mattergen
+git clone https://github.com/jpata/mattergen.git
+
+#install the requirements of this package
+uv sync
+
+#install mattersim for property evaluation
+git clone https://github.com/jpata/mattersim.git && cd mattersim && uv sync && cd ..
+
+#get the reference dataset for property evaluation
+git lfs pull -I data-release/alex-mp/reference_MP2020correction.gz --exclude=""
+mkdir logs
+
+#Run unguided generation
+sbatch scripts/workflow.sh
+
+#Run guided generation
+sbatch scripts/guided_workflow.sh
+```
+
 <h1>
 <p align="center">
     <img src="assets/MatterGenlogo_.png" alt="MatterGen logo" width="600"/>
