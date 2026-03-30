@@ -16,8 +16,8 @@ mkdir -p $RESULTS_DIR
 #1. Generate 16 materials randomly, without any guidance
 uv run python3 mattergen/scripts/generate.py \
   $RESULTS_DIR --pretrained-name=mattergen_base \
-  --batch_size=16 \
-  --num-batches 1
+  --batch_size=128 \
+  --num-batches 2
                                                         
 #2. Create video of the diffusion step for one trajectory
 uv run python3 scripts/render_trajectory_parallel.py \

@@ -13,6 +13,8 @@ uv sync
 #install mattersim for property evaluation
 git clone https://github.com/jpata/mattersim.git && cd mattersim && uv sync && cd ..
 
+#get the reference dataset for property evaluation
+git lfs pull -I data-release/alex-mp/reference_MP2020correction.gz --exclude=""
 mkdir logs
 
 #Run unguided generation

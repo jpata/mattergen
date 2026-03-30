@@ -23,8 +23,8 @@ mkdir -p $RESULTS_DIR
 echo "Step 1: Generating materials guided by chemical system Li-Fe-O..."
 uv run python3 mattergen/scripts/generate.py \
   $RESULTS_DIR --pretrained-name=chemical_system \
-  --batch_size=64 \
-  --num-batches 1 \
+  --batch_size=128 \
+  --num-batches 2 \
   --properties_to_condition_on="{'chemical_system':'Li-Fe-O'}" \
   --diffusion_guidance_factor=2.0
 
