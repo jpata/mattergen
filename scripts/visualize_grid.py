@@ -76,7 +76,7 @@ def visualize_grid(zip_path, metrics_path, output_path, rotation='45x,45y,0z'):
                         f"Status: {'Stable' if stable else 'Unstable'} | {'Novel' if novel else 'Known'}"
                     )
                     
-                    ax.set_title(title_text, fontsize=9, pad=10, fontweight='bold' if stable else 'normal')
+                    ax.set_title(title_text, fontsize=9, pad=10, fontweight='bold' if stable else 'normal', color='red' if (stable and novel) else 'black')
                     ax.axis('off')
                 finally:
                     os.remove(tmp_path)
