@@ -16,21 +16,26 @@ from ase.visualize.plot import plot_atoms
 def render_frame(args):
     """Worker function to render a single frame to a PNG file with fixed camera/view"""
     i, atoms, tmp_dir, xlim, ylim, rotation = args
-    fig, ax = plt.subplots(figsize=(6, 6))
+    # Create a 1920x1080 figure (19.2 x 10.8 inches at 100 DPI)
+    fig = plt.figure(figsize=(19.2, 10.8), dpi=100)
+    # Add axes that fill the entire figure for full control
+    ax = fig.add_axes([0, 0, 1, 1])
     
     # Render with fixed rotation
     plot_atoms(atoms, ax, radii=0.3, rotation=rotation)
     
-    # Apply fixed axes limits to stabilize the camera
+    # Apply fixed axes limits to stabilize the camera and ensure centering
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
-    
-    # Fixed Title position and formatting
-    ax.set_title(f"Step {i} | {atoms.get_chemical_formula()}", pad=20)
     ax.axis('off')
     
+    # Overlay Title
+    fig.text(0.5, 0.95, f"Step {i} | {atoms.get_chemical_formula()}", 
+             ha='center', va='top', fontsize=24, fontweight='bold',
+             bbox=dict(facecolor='white', alpha=0.7, edgecolor='none', pad=10))
+    
     frame_path = os.path.join(tmp_dir, f"frame_{i:06d}.png")
-    plt.savefig(frame_path, dpi=100, bbox_inches='tight')
+    fig.savefig(frame_path, dpi=100)
     plt.close(fig)
     return frame_path
 
@@ -69,14 +74,29 @@ def render_trajectory_parallel(zip_path, trajectory_filename, output_path, fps=5
         all_y.extend(cur_ylim)
         plt.close(fig_tmp)
     
-    global_xlim = (min(all_x), max(all_x))
-    global_ylim = (min(all_y), max(all_y))
+    min_x, max_x = min(all_x), max(all_x)
+    min_y, max_y = min(all_y), max(all_y)
+    center_x = (min_x + max_x) / 2
+    center_y = (min_y + max_y) / 2
     
-    # Add some padding
-    x_pad = (global_xlim[1] - global_xlim[0]) * 0.1
-    y_pad = (global_ylim[1] - global_ylim[0]) * 0.1
-    global_xlim = (global_xlim[0] - x_pad, global_xlim[1] + x_pad)
-    global_ylim = (global_ylim[0] - y_pad, global_ylim[1] + y_pad)
+    width = max_x - min_x
+    height = max_y - min_y
+    
+    # Target 16:9 aspect ratio
+    target_aspect = 1920 / 1080
+    if width / height > target_aspect:
+        display_width = width
+        display_height = width / target_aspect
+    else:
+        display_height = height
+        display_width = height * target_aspect
+    
+    # Add 20% padding to ensure atoms aren't cut off
+    display_width *= 1.2
+    display_height *= 1.2
+    
+    global_xlim = (center_x - display_width / 2, center_x + display_width / 2)
+    global_ylim = (center_y - display_height / 2, center_y + display_height / 2)
 
     print(f"Loaded {num_frames} frames. Rendering in parallel using {num_workers or os.cpu_count()} workers...")
 
